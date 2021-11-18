@@ -14,6 +14,7 @@
 #define OS_ERROR             3
 
 #define OS_MESSAGE_MAX_SIZE 20
+#define OS_EVENT_LOG_MSG_ID 999
 
 // clang-format off
 #define ENABLE_INTERRUPTS() __asm volatile ("cpsie i" ::: "memory");
@@ -35,6 +36,11 @@
         compile_time_check();                                                     \
         ((X) ? 0 : compile_time_check()), 0;                                      \
     })
+
+
+#ifndef UNUSED
+#define UNUSED(X) (void)(X)
+#endif
 
 /**
  * @brief Macro to be called upon entering an ISR
