@@ -5,6 +5,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef DEBUG_MODE_ENABLED
+#define DEBUG_PRINT_IS_QUEUE    1
+#define DEBUG_PRINT_IS_HANDLE   0
+#endif
+
 #define OS_BASEPRI 0x3F
 
 //! OS return codes

@@ -11,12 +11,18 @@ static TimedEventSimple_t* timed_events = NULL;
 static void SchedulerActivateNextAO();
 static void SchedulerProcessTimedEvents();
 
+OS_t* OSGetOS()
+{
+    return os_ptr;
+}
+
 void KernelInit(OS_t* os, OSCallbacksCfg_t* callback_cfg)
 {
     // set callbacks
     os->on_Init = callback_cfg->on_Init;
     os->on_Idle = callback_cfg->on_Idle;
     os->on_SysTick = callback_cfg->on_SysTick;
+    os->on_DebugPrint = callback_cfg->on_DebugPrint;
 
     // set init states and conditions
     os->time = 0;
@@ -76,26 +82,30 @@ void SchedulerProcessTimedEvents()
         {
             MsgQueuePut(head->dest, (void*)head->message);
             head->count = 0;
-        }
 
-        // don't remove if periodic, remove from list if single
-        if(TIMED_EVENT_PERIODIC_TYPE == head->type)
-        {
-            // go to next
-            trail = head;
-            head = head->next;
-        }
-        else
-        {
-            // default to single execution
-            head = head->next;
-
-            if(trail)
+            // remove single event from queue
+            if(TIMED_EVENT_SINGLE_TYPE == head->type)
             {
-                // skip over removed
-                trail->next = head;
+                if (timed_events == head)
+                {
+                    // need to move root event pointer to the next event if we're removing
+                    // the first event
+                    timed_events = head->next;
+                }
+
+                head = head->next;
+                if(trail)
+                {
+                    trail->next->next = NULL;
+                    trail->next = head;
+                }
+                
+                continue;
             }
         }
+
+        trail = head;
+        head = head->next;
     }
 }
 
@@ -129,7 +139,7 @@ void SchedulerAddTimedEvent(TimedEventSimple_t* event)
 }
 
 void ActiveObjectCreate(ActiveObject_t* ao, uint8_t priority, MessageQueue_t* queue,
-                        EventHandler_f handler)
+                        EventHandler_f handler, uint8_t id)
 {
     // set instance data
     ao->priority = priority;
@@ -139,6 +149,7 @@ void ActiveObjectCreate(ActiveObject_t* ao, uint8_t priority, MessageQueue_t* qu
 
     ao->next = NULL;
     ao->prev = NULL;
+    ao->id = id;
 }
 
 void SchedulerRun()
@@ -180,6 +191,11 @@ void SchedulerActivateAO()
         while(!MsgQueueIsEmpty(activated_ao->msg_queue))
         {
             Message_t* msg = (Message_t*)MsgQueueGet(activated_ao);
+
+#ifdef DEBUG_MODE_ENABLED
+            os_ptr->on_DebugPrint(activated_ao->id, msg->id, DEBUG_PRINT_IS_HANDLE);
+#endif
+
             activated_ao->handler(msg);
         }
 

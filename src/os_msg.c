@@ -112,6 +112,11 @@ MessageQueueStatus_t MsgQueuePut(ActiveObject_t* dest, void* msg)
         os_memcpy(&dest->msg_queue->queue[dest->msg_queue->head], msg, ((Message_t*)msg)->msg_size);
         AdvancePointer(dest->msg_queue);
 
+#ifdef DEBUG_MODE_ENABLED
+        OSGetOS()->on_DebugPrint(dest->id, ((Message_t*)msg)->id, DEBUG_PRINT_IS_QUEUE);
+#endif
+
+
         // notify scheduler to make destination AO ready
         SchedulerAddReady(dest);
     }

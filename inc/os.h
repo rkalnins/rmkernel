@@ -25,9 +25,9 @@
  * @brief Macro to create a message queue and active object
  *
  */
-#define AO_INIT(name, priority, handler, size)                                \
+#define AO_INIT(name, priority, handler, size, id)                           \
     MsgQueueCreate(&name##_message_queue, size, name##_message_queue_buffer); \
-    ActiveObjectCreate(&name, priority, &name##_message_queue, handler);
+    ActiveObjectCreate(&name, priority, &name##_message_queue, handler, id);
 
 /**
  * @brief State of the Active Object
@@ -49,6 +49,7 @@ struct OSCallbacksCfg_s
     void (*on_SysTick)(void); //!< Hooked to end of SysTick_Handler
     void (*on_Idle)(void); //!< Hooked to scheduler idle loop
     void (*on_Init)(void); //!< Hooked to end of KernelInit
+    void (*on_DebugPrint)(uint8_t, uint32_t, uint8_t);
 };
 
 /**
@@ -63,6 +64,7 @@ struct OS_s
     void (*on_SysTick)(void); //!< Hooked to end of SysTick_Handler
     void (*on_Idle)(void); //!< Hooked to scheduler idle loop
     void (*on_Init)(void); //!< Hooked to end of KernelInit
+    void (*on_DebugPrint)(uint8_t, uint32_t, uint8_t);
 };
 
 /**
@@ -101,9 +103,12 @@ struct ActiveObject_s
     ActiveObjectState_t state; //!< current state of AO
     EventHandler_f handler; //!< Event/message handler
     uint8_t priority; //!< task priority 0-255
+    uint8_t id;
     ActiveObject_t* next; //!< next AO in queue
     ActiveObject_t* prev; //!< prev AO in queue
 };
+
+extern OS_t* OSGetOS();
 
 /**
  * @brief Get system time (ms)
@@ -129,7 +134,7 @@ extern void KernelInit(OS_t* os, OSCallbacksCfg_t* callback_cfg);
  * @param handler
  */
 extern void ActiveObjectCreate(ActiveObject_t* ao, uint8_t priority, MessageQueue_t* queue,
-                               EventHandler_f handler);
+                               EventHandler_f handler, uint8_t id);
 
 /**
  * @brief Start the scheduler, does not return.
