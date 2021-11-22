@@ -10,7 +10,7 @@ static TimedEventSimple_t* timed_events = NULL;
 
 static void SchedulerActivateNextAO();
 static void SchedulerProcessTimedEvents();
-static void RemoveTimedEvent(TimedEventSimple_t *head, TimedEventSimple_t* trail);
+static void RemoveTimedEvent(TimedEventSimple_t **head, TimedEventSimple_t **trail);
 
 OS_t* OSGetOS()
 {
@@ -78,7 +78,7 @@ static void SchedulerProcessTimedEvents()
     {
         if (!head->active)
         {
-            RemoveTimedEvent(head, trail);
+            RemoveTimedEvent(&head, &trail);
             continue;
         }
 
@@ -93,7 +93,7 @@ static void SchedulerProcessTimedEvents()
             // remove single event from queue
             if(TIMED_EVENT_SINGLE_TYPE == head->type)
             {
-                RemoveTimedEvent(head, trail);
+                RemoveTimedEvent(&head, &trail);
                 continue;
             }
         }
@@ -103,20 +103,20 @@ static void SchedulerProcessTimedEvents()
     }
 }
 
-static void RemoveTimedEvent(TimedEventSimple_t *head, TimedEventSimple_t *trail)
+static void RemoveTimedEvent(TimedEventSimple_t **head, TimedEventSimple_t **trail)
 {
-    if (timed_events == head)
+    if (timed_events == *head)
     {
         // need to move root event pointer to the next event if we're removing
         // the first event
-        timed_events = head->next;
+        timed_events = (*head)->next;
     }
 
-    head = head->next;
-    if(trail)
+    *head = (*head)->next;
+    if(*trail)
     {
-        trail->next->next = NULL;
-        trail->next = head;
+        (*trail)->next->next = NULL;
+        (*trail)->next = *head;
     }
 
 }
