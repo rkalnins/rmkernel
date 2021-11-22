@@ -89,6 +89,7 @@ struct TimedEventSimple_s
     void* message; //!< message to dispatch
     uint32_t period; //!< delay or period of dispatch (ms)
     uint32_t count; //!< current count since last dispatch
+    bool active;
     TimedEventType_t type; //!< single or periodic
     TimedEventSimple_t* next; //!< next event in list
 };
@@ -175,6 +176,11 @@ extern void SchedulerAddReady(ActiveObject_t* ao);
  */
 extern void TimedEventSimpleCreate(TimedEventSimple_t* event, ActiveObject_t* dest, void* msg,
                                    uint32_t period, TimedEventType_t type);
+
+/**
+ * @brief Disable the event and remove it from the queue
+ */
+extern void TimedEventDisable(TimedEventSimple_t *event);
 
 /**
  * @brief Schedules a timed event

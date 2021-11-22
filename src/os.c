@@ -10,6 +10,7 @@ static TimedEventSimple_t* timed_events = NULL;
 
 static void SchedulerActivateNextAO();
 static void SchedulerProcessTimedEvents();
+static void RemoveTimedEvent(TimedEventSimple_t *head, TimedEventSimple_t* trail);
 
 OS_t* OSGetOS()
 {
@@ -57,7 +58,7 @@ __attribute__((__interrupt__)) void SysTick_Handler()
     OS_ISR_EXIT(os_ptr);
 }
 
-uint32_t OSGetTime()
+extern uint32_t OSGetTime()
 {
     return os_ptr->time;
 }
@@ -66,7 +67,7 @@ uint32_t OSGetTime()
  * @brief Updates timed events and dispatches if necessary
  *
  */
-void SchedulerProcessTimedEvents()
+static void SchedulerProcessTimedEvents()
 {
     // list traversal head, trail is prev
     TimedEventSimple_t* head = timed_events;
@@ -75,6 +76,12 @@ void SchedulerProcessTimedEvents()
     // for each item in list
     while(head)
     {
+        if (!head->active)
+        {
+            RemoveTimedEvent(head, trail);
+            continue;
+        }
+
         head->count++;
 
         // dispatch if time is up
@@ -86,20 +93,7 @@ void SchedulerProcessTimedEvents()
             // remove single event from queue
             if(TIMED_EVENT_SINGLE_TYPE == head->type)
             {
-                if (timed_events == head)
-                {
-                    // need to move root event pointer to the next event if we're removing
-                    // the first event
-                    timed_events = head->next;
-                }
-
-                head = head->next;
-                if(trail)
-                {
-                    trail->next->next = NULL;
-                    trail->next = head;
-                }
-                
+                RemoveTimedEvent(head, trail);
                 continue;
             }
         }
@@ -109,7 +103,30 @@ void SchedulerProcessTimedEvents()
     }
 }
 
-void TimedEventSimpleCreate(TimedEventSimple_t* event, ActiveObject_t* dest, void* msg,
+static void RemoveTimedEvent(TimedEventSimple_t *head, TimedEventSimple_t *trail)
+{
+    if (timed_events == head)
+    {
+        // need to move root event pointer to the next event if we're removing
+        // the first event
+        timed_events = head->next;
+    }
+
+    head = head->next;
+    if(trail)
+    {
+        trail->next->next = NULL;
+        trail->next = head;
+    }
+
+}
+
+extern void TimedEventDisable(TimedEventSimple_t* event)
+{
+    event->active = false;
+}
+
+extern void TimedEventSimpleCreate(TimedEventSimple_t* event, ActiveObject_t* dest, void* msg,
                             uint32_t period, TimedEventType_t type)
 {
     // set data
@@ -118,11 +135,12 @@ void TimedEventSimpleCreate(TimedEventSimple_t* event, ActiveObject_t* dest, voi
     event->type = type;
     event->dest = dest;
     event->count = 0;
+    event->active = true;
 
     event->next = NULL;
 }
 
-void SchedulerAddTimedEvent(TimedEventSimple_t* event)
+extern void SchedulerAddTimedEvent(TimedEventSimple_t* event)
 {
     // reset count
     event->count = 0;
@@ -138,7 +156,7 @@ void SchedulerAddTimedEvent(TimedEventSimple_t* event)
     timed_events = event;
 }
 
-void ActiveObjectCreate(ActiveObject_t* ao, uint8_t priority, MessageQueue_t* queue,
+extern void ActiveObjectCreate(ActiveObject_t* ao, uint8_t priority, MessageQueue_t* queue,
                         EventHandler_f handler, uint8_t id)
 {
     // set instance data
@@ -152,7 +170,7 @@ void ActiveObjectCreate(ActiveObject_t* ao, uint8_t priority, MessageQueue_t* qu
     ao->id = id;
 }
 
-void SchedulerRun()
+extern void SchedulerRun()
 {
     while(true)
     {
@@ -164,7 +182,7 @@ void SchedulerRun()
     }
 }
 
-int Schedule()
+extern int Schedule()
 {
     // if there's something higher in priority than what's current
     if(activated_ao->priority < os_ptr->current_prio)
@@ -177,7 +195,7 @@ int Schedule()
     }
 }
 
-void SchedulerActivateAO()
+extern void SchedulerActivateAO()
 {
     // run all ready tasks
     while(activated_ao)
@@ -204,7 +222,7 @@ void SchedulerActivateAO()
     }
 }
 
-void SchedulerAddReady(ActiveObject_t* ao)
+extern void SchedulerAddReady(ActiveObject_t* ao)
 {
     // just add to list if already running, no need to requeue
     if(AO_ACTIVE == ao->state || activated_ao == ao)
@@ -289,7 +307,7 @@ void SchedulerAddReady(ActiveObject_t* ao)
     ao->state = AO_READY;
 }
 
-void SchedulerActivateNextAO()
+static void SchedulerActivateNextAO()
 {
     // deactivate current
     activated_ao->state = AO_WAITING;
