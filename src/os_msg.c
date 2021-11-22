@@ -1,9 +1,6 @@
 
-#include "inc/os.h"
 #include "inc/os_msg.h"
-
-
-static uint16_t GetAvailableCount(MessageQueue_t* q);
+#include "inc/os.h"
 
 static void AdvancePointer(MessageQueue_t* q);
 static void RetreatPointer(MessageQueue_t* q);
@@ -12,32 +9,6 @@ bool MsgQueueIsEmpty(MessageQueue_t* q)
 {
     // not full and head and tail are the same
     return !q->is_full && (q->head == q->tail);
-}
-
-/**
- * @brief get the amount of space left in the queue
- *
- * @param q
- * @return uint16_t
- */
-uint16_t GetAvailableCount(MessageQueue_t* q)
-{
-    uint16_t size = q->size;
-
-    if(!q->is_full)
-    {
-        // either subtract, or offset then substract to get size
-        if(q->head >= q->tail)
-        {
-            size = q->head - q->tail;
-        }
-        else
-        {
-            size = q->size + q->head - q->tail;
-        }
-    }
-
-    return size;
 }
 
 /**
@@ -115,7 +86,6 @@ MessageQueueStatus_t MsgQueuePut(ActiveObject_t* dest, void* msg)
 #ifdef DEBUG_MODE_ENABLED
         OSGetOS()->on_DebugPrint(dest->id, ((Message_t*)msg)->id, DEBUG_PRINT_IS_QUEUE);
 #endif
-
 
         // notify scheduler to make destination AO ready
         SchedulerAddReady(dest);
