@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef DEBUG_MODE_ENABLED
+#ifdef OS_TRACE_ENABLED
 #define DEBUG_PRINT_IS_QUEUE    1
 #define DEBUG_PRINT_IS_HANDLE   0
 #endif
@@ -34,18 +34,21 @@
 
 // clang-format on
 
-//! compile time assertion
-#define STATIC_ASSERT(X)                                                          \
-    ({                                                                            \
-        extern int __attribute__((error("assertion failure: '" #X "' not true"))) \
-        compile_time_check();                                                     \
-        ((X) ? 0 : compile_time_check()), 0;                                      \
-    })
-
 
 #ifndef UNUSED
 #define UNUSED(X) (void)(X)
 #endif
+
+//! compile time assertion
+#define STATIC_ASSERT(X)                                                            \
+    do                                                                              \
+    {                                                                               \
+        extern int __attribute__((error("assertion failure: '" #X "' not true")))   \
+        compile_time_check();                                                       \
+        int tmp = ((X) ? 0 : compile_time_check());                                 \
+        UNUSED(tmp);                                                                \
+    } while(false);                                                                 \
+
 
 /**
  * @brief Macro to be called upon entering an ISR

@@ -61,7 +61,7 @@ extern uint8_t* OSMemoryBlockNew(uint16_t* key, BlockSize_t size, OSStatus_t* st
 extern uint8_t* OSMemoryBlockGet(uint16_t key)
 {
     // return the index of the block
-    return pool + (key & 0xff);
+    return pool + MEMORY_BLOCK_32 * (key & 0xff);
 }
 
 extern OSStatus_t OSMemoryFreeBlock(uint16_t key)

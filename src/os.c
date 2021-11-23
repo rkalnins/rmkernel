@@ -210,7 +210,7 @@ extern void SchedulerActivateAO()
         {
             Message_t* msg = (Message_t*)MsgQueueGet(activated_ao);
 
-#ifdef DEBUG_MODE_ENABLED
+#ifdef OS_TRACE_ENABLED
             os_ptr->on_DebugPrint(activated_ao->id, msg->id, DEBUG_PRINT_IS_HANDLE);
 #endif
 
