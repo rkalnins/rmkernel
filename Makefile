@@ -1,9 +1,5 @@
-all: fullclean clean build
-.PHONY: fullclean clean build
-
-
-fullclean :
-	rm -rf build/ debug/
+all: clean build
+.PHONY: clean build
 
 clean :
 	$(MAKE) clean -C build
