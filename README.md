@@ -16,7 +16,7 @@ Tested and developed on STM32 platforms using `stm32-cmake`
 
 ### UART
 
-- `VddIO2` must be enabled for LPUART to work. Enable `PWR` clock beforehand.
+- `VddIO2` must be enabled for LPUART to work on STM32L4R5. Enable `PWR` clock beforehand.
 
 ### Clocks, Timing
 
