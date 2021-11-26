@@ -1,5 +1,4 @@
-#ifndef OS_H
-#define OS_H
+#pragma once
 
 #include "os_defs.h"
 #include "os_util.h"
@@ -189,4 +188,4 @@ extern void TimedEventDisable(TimedEventSimple_t *event);
  */
 extern void SchedulerAddTimedEvent(TimedEventSimple_t* event);
 
-#endif
+

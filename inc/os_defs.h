@@ -1,5 +1,4 @@
-#ifndef OS_DEFS_H
-#define OS_DEFS_H
+#pragma once
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -106,4 +105,3 @@ typedef struct TimedEventSimple_s TimedEventSimple_t;
  */
 typedef void (*EventHandler_f)(Message_t*);
 
-#endif

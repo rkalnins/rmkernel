@@ -1,5 +1,4 @@
-#ifndef OS_MSG_H
-#define OS_MSG_H
+#pragma once
 
 #include "os_defs.h"
 
@@ -91,4 +90,3 @@ extern MessageQueueStatus_t MsgQueuePut(ActiveObject_t* dest, void* msg);
  */
 extern void* MsgQueueGet(ActiveObject_t* ao);
 
-#endif

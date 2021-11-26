@@ -1,5 +1,4 @@
-#ifndef OS_UTIL_H
-#define OS_UTIL_H
+#pragma once
 
 #include <stdint.h>
 
@@ -13,4 +12,3 @@
  */
 extern void* os_memcpy(void* dest, const void* src, uint32_t len);
 
-#endif

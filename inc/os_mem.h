@@ -1,5 +1,4 @@
-#ifndef OS_MEM_H
-#define OS_MEM_H
+#pragma once
 
 #include "os_defs.h"
 
@@ -36,4 +35,3 @@ extern uint8_t* OSMemoryBlockGet(uint16_t key);
  */
 extern OSStatus_t OSMemoryFreeBlock(uint16_t key);
 
-#endif
