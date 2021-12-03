@@ -111,9 +111,10 @@ static void RemoveTimedEvent(TimedEventSimple_t **head, TimedEventSimple_t **tra
         // the first event
         timed_events = (*head)->next;
     }
-
+    
     *head = (*head)->next;
-    if(*trail)
+
+    if (*trail)
     {
         (*trail)->next->next = NULL;
         (*trail)->next = *head;
@@ -135,16 +136,31 @@ extern void TimedEventSimpleCreate(TimedEventSimple_t* event, ActiveObject_t* de
     event->type = type;
     event->dest = dest;
     event->count = 0;
-    event->active = true;
 
-    event->next = NULL;
+    event->active = true;
 }
 
 extern void SchedulerAddTimedEvent(TimedEventSimple_t* event)
 {
+
     // reset count
     event->count = 0;
 
+    TimedEventSimple_t *head = timed_events;
+
+    while (head)
+    {
+        if (head == event)
+        {
+            return;
+        }
+        
+        head = head->next;
+    }
+
+    event->next = NULL;
+
+    // TODO: is the necessary anymore?
     // no self chaining
     if(event != timed_events)
     {
