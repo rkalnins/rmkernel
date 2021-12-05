@@ -3,7 +3,7 @@
 
 #define POOL_SIZE 512
 
-static uint8_t pool[POOL_SIZE] = {0};
+static uint8_t  pool[POOL_SIZE] = {0};
 static uint32_t used = 0;
 
 extern uint8_t* OSMemoryBlockNew(uint16_t* key, BlockSize_t size, OSStatus_t* status)
@@ -12,11 +12,11 @@ extern uint8_t* OSMemoryBlockNew(uint16_t* key, BlockSize_t size, OSStatus_t* st
     uint8_t* block = NULL;
 
     // create mask
-    uint8_t block_bits = (size / MEMORY_BLOCK_32);
+    uint8_t  block_bits = (size / MEMORY_BLOCK_32);
     uint32_t search_mask = (1U << block_bits) - 1;
 
     // make sure we're not going to loop forever
-    if(0 >= POOL_SIZE / 32 - size)
+    if (0 >= POOL_SIZE / 32 - size)
     {
         *status = OS_ERROR;
         return NULL;
@@ -27,10 +27,10 @@ extern uint8_t* OSMemoryBlockNew(uint16_t* key, BlockSize_t size, OSStatus_t* st
     DISABLE_INTERRUPTS();
 
     // iterate and shift on multiple of of block size (i.e. the number of bits in "used")
-    for(uint8_t i = 0; i < (POOL_SIZE / 32) - block_bits; i += block_bits)
+    for (uint8_t i = 0; i < (POOL_SIZE / 32) - block_bits; i += block_bits)
     {
         // if an empty location is found, use it
-        if(0 == (search_mask & used))
+        if (0 == (search_mask & used))
         {
             block = pool + (i * MEMORY_BLOCK_32);
             used |= search_mask;
@@ -45,7 +45,7 @@ extern uint8_t* OSMemoryBlockNew(uint16_t* key, BlockSize_t size, OSStatus_t* st
     ENABLE_INTERRUPTS();
 
     // set status
-    if(NULL == block)
+    if (NULL == block)
     {
         *status = OS_MEMORY_BLOCK_FULL;
     }
@@ -67,7 +67,7 @@ extern uint8_t* OSMemoryBlockGet(uint16_t key)
 extern OSStatus_t OSMemoryFreeBlock(uint16_t key)
 {
     // build the mask
-    uint8_t block_bits = ((key >> 8) / MEMORY_BLOCK_32);
+    uint8_t  block_bits = ((key >> 8) / MEMORY_BLOCK_32);
     uint32_t clear_mask = ~(((1 << block_bits) - 1) << (key & 0xff));
 
     // don't want to be interrupted here either

@@ -10,22 +10,22 @@
  * @brief Macro to declare an AO with a message queue and message queue buffer
  *
  */
-#define ACTIVE_OBJECT_EXTERN(name, queue_size)  \
-    extern ActiveObject_t name;                 \
-    extern MessageQueue_t name##_message_queue; \
+#define ACTIVE_OBJECT_EXTERN(name, queue_size)                                                     \
+    extern ActiveObject_t   name;                                                                  \
+    extern MessageQueue_t   name##_message_queue;                                                  \
     extern MessageGeneric_t name##_message_queue_buffer[queue_size];
 
-#define ACTIVE_OBJECT_DECL(name, queue_size) \
-    ActiveObject_t name;                     \
-    MessageQueue_t name##_message_queue;     \
+#define ACTIVE_OBJECT_DECL(name, queue_size)                                                       \
+    ActiveObject_t   name;                                                                         \
+    MessageQueue_t   name##_message_queue;                                                         \
     MessageGeneric_t name##_message_queue_buffer[queue_size];
 
 /**
  * @brief Macro to create a message queue and active object
  *
  */
-#define AO_INIT(name, priority, handler, size, id)                           \
-    MsgQueueCreate(&name##_message_queue, size, name##_message_queue_buffer); \
+#define AO_INIT(name, priority, handler, size, id)                                                 \
+    MsgQueueCreate(&name##_message_queue, size, name##_message_queue_buffer);                      \
     ActiveObjectCreate(&name, priority, &name##_message_queue, handler, id);
 
 /**
@@ -59,7 +59,7 @@ struct OS_s
 {
     uint32_t time; //!< current tick time, incremented with SysTick_Handler
     uint16_t current_prio; //!< current active AO priority
-    uint8_t nesting; //!< scheduler nesting count, increment on ISR enter, decrement on exit
+    uint8_t  nesting; //!< scheduler nesting count, increment on ISR enter, decrement on exit
     void (*on_SysTick)(void); //!< Hooked to end of SysTick_Handler
     void (*on_Idle)(void); //!< Hooked to scheduler idle loop
     void (*on_Init)(void); //!< Hooked to end of KernelInit
@@ -84,12 +84,12 @@ typedef enum TimedEventType_e
  */
 struct TimedEventSimple_s
 {
-    ActiveObject_t* dest; //!< active object receiving dispatched message
-    void* message; //!< message to dispatch
-    uint32_t period; //!< delay or period of dispatch (ms)
-    uint32_t count; //!< current count since last dispatch
-    bool active;
-    TimedEventType_t type; //!< single or periodic
+    ActiveObject_t*     dest; //!< active object receiving dispatched message
+    void*               message; //!< message to dispatch
+    uint32_t            period; //!< delay or period of dispatch (ms)
+    uint32_t            count; //!< current count since last dispatch
+    bool                active;
+    TimedEventType_t    type; //!< single or periodic
     TimedEventSimple_t* next; //!< next event in list
 };
 
@@ -99,13 +99,13 @@ struct TimedEventSimple_s
  */
 struct ActiveObject_s
 {
-    MessageQueue_t* msg_queue; //!< Incoming message queue
+    MessageQueue_t*     msg_queue; //!< Incoming message queue
     ActiveObjectState_t state; //!< current state of AO
-    EventHandler_f handler; //!< Event/message handler
-    uint8_t priority; //!< task priority 0-255
-    uint8_t id;
-    ActiveObject_t* next; //!< next AO in queue
-    ActiveObject_t* prev; //!< prev AO in queue
+    EventHandler_f      handler; //!< Event/message handler
+    uint8_t             priority; //!< task priority 0-255
+    uint8_t             id;
+    ActiveObject_t*     next; //!< next AO in queue
+    ActiveObject_t*     prev; //!< prev AO in queue
 };
 
 extern OS_t* OSGetOS();
@@ -179,7 +179,7 @@ extern void TimedEventSimpleCreate(TimedEventSimple_t* event, ActiveObject_t* de
 /**
  * @brief Disable the event and remove it from the queue
  */
-extern void TimedEventDisable(TimedEventSimple_t *event);
+extern void TimedEventDisable(TimedEventSimple_t* event);
 
 /**
  * @brief Schedules a timed event
@@ -187,5 +187,3 @@ extern void TimedEventDisable(TimedEventSimple_t *event);
  * @param event
  */
 extern void SchedulerAddTimedEvent(TimedEventSimple_t* event);
-
-

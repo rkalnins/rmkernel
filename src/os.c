@@ -5,12 +5,12 @@
 static OS_t* os_ptr;
 
 //! queue head pointers
-static ActiveObject_t* activated_ao = NULL;
+static ActiveObject_t*     activated_ao = NULL;
 static TimedEventSimple_t* timed_events = NULL;
 
 static void SchedulerActivateNextAO();
 static void SchedulerProcessTimedEvents();
-static void RemoveTimedEvent(TimedEventSimple_t **head, TimedEventSimple_t **trail);
+static void RemoveTimedEvent(TimedEventSimple_t** head, TimedEventSimple_t** trail);
 
 OS_t* OSGetOS()
 {
@@ -33,7 +33,7 @@ void KernelInit(OS_t* os, OSCallbacksCfg_t* callback_cfg)
     os_ptr = os;
 
     // hook
-    if(os_ptr->on_Init)
+    if (os_ptr->on_Init)
     {
         os->on_Init();
     }
@@ -50,7 +50,7 @@ __attribute__((__interrupt__)) void SysTick_Handler()
     SchedulerProcessTimedEvents();
 
     // hook
-    if(os_ptr->on_SysTick)
+    if (os_ptr->on_SysTick)
     {
         os_ptr->on_SysTick();
     }
@@ -74,7 +74,7 @@ static void SchedulerProcessTimedEvents()
     TimedEventSimple_t* trail = NULL;
 
     // for each item in list
-    while(head)
+    while (head)
     {
         if (!head->active)
         {
@@ -85,13 +85,13 @@ static void SchedulerProcessTimedEvents()
         head->count++;
 
         // dispatch if time is up
-        if(head->count >= head->period)
+        if (head->count >= head->period)
         {
             MsgQueuePut(head->dest, (void*)head->message);
             head->count = 0;
 
             // remove single event from queue
-            if(TIMED_EVENT_SINGLE_TYPE == head->type)
+            if (TIMED_EVENT_SINGLE_TYPE == head->type)
             {
                 RemoveTimedEvent(&head, &trail);
                 continue;
@@ -103,7 +103,7 @@ static void SchedulerProcessTimedEvents()
     }
 }
 
-static void RemoveTimedEvent(TimedEventSimple_t **head, TimedEventSimple_t **trail)
+static void RemoveTimedEvent(TimedEventSimple_t** head, TimedEventSimple_t** trail)
 {
     if (timed_events == *head)
     {
@@ -111,7 +111,7 @@ static void RemoveTimedEvent(TimedEventSimple_t **head, TimedEventSimple_t **tra
         // the first event
         timed_events = (*head)->next;
     }
-    
+
     *head = (*head)->next;
 
     if (*trail)
@@ -119,7 +119,6 @@ static void RemoveTimedEvent(TimedEventSimple_t **head, TimedEventSimple_t **tra
         (*trail)->next->next = NULL;
         (*trail)->next = *head;
     }
-
 }
 
 extern void TimedEventDisable(TimedEventSimple_t* event)
@@ -128,7 +127,7 @@ extern void TimedEventDisable(TimedEventSimple_t* event)
 }
 
 extern void TimedEventSimpleCreate(TimedEventSimple_t* event, ActiveObject_t* dest, void* msg,
-                            uint32_t period, TimedEventType_t type)
+                                   uint32_t period, TimedEventType_t type)
 {
     // set data
     event->message = msg;
@@ -142,11 +141,10 @@ extern void TimedEventSimpleCreate(TimedEventSimple_t* event, ActiveObject_t* de
 
 extern void SchedulerAddTimedEvent(TimedEventSimple_t* event)
 {
-
     // reset count
     event->count = 0;
 
-    TimedEventSimple_t *head = timed_events;
+    TimedEventSimple_t* head = timed_events;
 
     while (head)
     {
@@ -154,7 +152,7 @@ extern void SchedulerAddTimedEvent(TimedEventSimple_t* event)
         {
             return;
         }
-        
+
         head = head->next;
     }
 
@@ -162,7 +160,7 @@ extern void SchedulerAddTimedEvent(TimedEventSimple_t* event)
 
     // TODO: is the necessary anymore?
     // no self chaining
-    if(event != timed_events)
+    if (event != timed_events)
     {
         // when removed connections might not be clean
         event->next = timed_events;
@@ -173,7 +171,7 @@ extern void SchedulerAddTimedEvent(TimedEventSimple_t* event)
 }
 
 extern void ActiveObjectCreate(ActiveObject_t* ao, uint8_t priority, MessageQueue_t* queue,
-                        EventHandler_f handler, uint8_t id)
+                               EventHandler_f handler, uint8_t id)
 {
     // set instance data
     ao->priority = priority;
@@ -188,10 +186,10 @@ extern void ActiveObjectCreate(ActiveObject_t* ao, uint8_t priority, MessageQueu
 
 extern void SchedulerRun()
 {
-    while(true)
+    while (true)
     {
         // idle loop
-        if(os_ptr->on_Idle)
+        if (os_ptr->on_Idle)
         {
             os_ptr->on_Idle();
         }
@@ -201,7 +199,7 @@ extern void SchedulerRun()
 extern int Schedule()
 {
     // if there's something higher in priority than what's current
-    if(activated_ao->priority < os_ptr->current_prio)
+    if (activated_ao->priority < os_ptr->current_prio)
     {
         return 1;
     }
@@ -214,7 +212,7 @@ extern int Schedule()
 extern void SchedulerActivateAO()
 {
     // run all ready tasks
-    while(activated_ao)
+    while (activated_ao)
     {
         activated_ao->state = AO_ACTIVE;
 
@@ -222,7 +220,7 @@ extern void SchedulerActivateAO()
         os_ptr->current_prio = activated_ao->priority;
 
         // empty all messages in queue
-        while(!MsgQueueIsEmpty(activated_ao->msg_queue))
+        while (!MsgQueueIsEmpty(activated_ao->msg_queue))
         {
             Message_t* msg = (Message_t*)MsgQueueGet(activated_ao);
 
@@ -241,13 +239,13 @@ extern void SchedulerActivateAO()
 extern void SchedulerAddReady(ActiveObject_t* ao)
 {
     // just add to list if already running, no need to requeue
-    if(AO_ACTIVE == ao->state || activated_ao == ao)
+    if (AO_ACTIVE == ao->state || activated_ao == ao)
     {
         return;
     }
 
     // extract from list and reinsert to get correct priority (something else might be running too)
-    if(AO_READY == ao->state)
+    if (AO_READY == ao->state)
     {
         ao->prev->next = ao->next;
         ao->next->prev = ao->prev;
@@ -264,7 +262,7 @@ extern void SchedulerAddReady(ActiveObject_t* ao)
     ActiveObject_t* temp = activated_ao;
     ActiveObject_t* parent = NULL;
 
-    if(!activated_ao)
+    if (!activated_ao)
     {
         // set list head if nothing has been set yet
         activated_ao = ao;
@@ -272,21 +270,21 @@ extern void SchedulerAddReady(ActiveObject_t* ao)
     else
     {
         // find position
-        while(temp && temp->priority < ao->priority)
+        while (temp && temp->priority < ao->priority)
         {
             parent = temp;
             temp = temp->next;
         }
 
-        if(!parent)
+        if (!parent)
         {
             // start of the list
 
             // insert after current ao if active, if READY, insert before
-            if(activated_ao->state == AO_ACTIVE)
+            if (activated_ao->state == AO_ACTIVE)
             {
                 // don't want to interrupt so put it after
-                if(activated_ao->next)
+                if (activated_ao->next)
                 {
                     activated_ao->next->prev = ao;
                 }
@@ -303,7 +301,7 @@ extern void SchedulerAddReady(ActiveObject_t* ao)
                 activated_ao = ao;
             }
         }
-        else if(!temp)
+        else if (!temp)
         {
             // at end
             parent->next = ao;
@@ -337,7 +335,7 @@ static void SchedulerActivateNextAO()
     prev_activated->prev = NULL;
 
     // reset current priority if all AOs have run
-    if(!activated_ao)
+    if (!activated_ao)
     {
         os_ptr->current_prio = 0xFF;
     }

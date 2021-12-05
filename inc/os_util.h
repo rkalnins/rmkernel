@@ -11,4 +11,3 @@
  * @return void*
  */
 extern void* os_memcpy(void* dest, const void* src, uint32_t len);
-

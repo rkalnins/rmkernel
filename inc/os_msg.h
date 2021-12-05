@@ -25,21 +25,21 @@ struct MessageGeneric_s
 struct Message_s
 {
     uint32_t id; //!< message id
-    uint8_t msg_size; //<! length of message
+    uint8_t  msg_size; //<! length of message
 };
 
 struct DataMessage_s
 {
     Message_t base;
-    uint32_t timestamp; //!< message timestamp
-    uint32_t data; //!< message data
+    uint32_t  timestamp; //!< message timestamp
+    uint32_t  data; //!< message data
 };
 
 struct MemoryBlockMessage_s
 {
     Message_t base;
-    uint16_t key;
-    uint8_t size;
+    uint16_t  key;
+    uint8_t   size;
 };
 
 /**
@@ -51,8 +51,8 @@ struct MessageQueue_s
     MessageGeneric_t* queue; //!< buffer
     volatile uint16_t head; //!< index
     volatile uint16_t tail; //!< index
-    uint16_t size; //!< buffer size
-    bool is_full;
+    uint16_t          size; //!< buffer size
+    bool              is_full;
 };
 
 /**
@@ -89,4 +89,3 @@ extern MessageQueueStatus_t MsgQueuePut(ActiveObject_t* dest, void* msg);
  * @return Message_t*
  */
 extern void* MsgQueueGet(ActiveObject_t* ao);
-

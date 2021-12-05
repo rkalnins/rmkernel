@@ -34,4 +34,3 @@ extern uint8_t* OSMemoryBlockGet(uint16_t key);
  * @return OSStatus_t OS_SUCCESS
  */
 extern OSStatus_t OSMemoryFreeBlock(uint16_t key);
-

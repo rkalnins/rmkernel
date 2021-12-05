@@ -19,12 +19,12 @@ bool MsgQueueIsEmpty(MessageQueue_t* q)
 void AdvancePointer(MessageQueue_t* q)
 {
     // if full
-    if(q->is_full)
+    if (q->is_full)
     {
         // advance and wrap the tail
         ++q->tail;
 
-        if(q->size == q->tail)
+        if (q->size == q->tail)
         {
             q->tail = 0;
         }
@@ -33,7 +33,7 @@ void AdvancePointer(MessageQueue_t* q)
     // always advance and wrap head
     ++q->head;
 
-    if(q->size == q->head)
+    if (q->size == q->head)
     {
         q->head = 0;
     }
@@ -54,7 +54,7 @@ void RetreatPointer(MessageQueue_t* q)
     // move and wrap tail index
     ++q->tail;
 
-    if(q->size == q->tail)
+    if (q->size == q->tail)
     {
         q->tail = 0;
     }
@@ -77,7 +77,7 @@ MessageQueueStatus_t MsgQueuePut(ActiveObject_t* dest, void* msg)
     MessageQueueStatus_t status = MSG_Q_SUCCESS;
 
     // add only if full
-    if(!dest->msg_queue->is_full)
+    if (!dest->msg_queue->is_full)
     {
         // copy message into buffer
         os_memcpy(&dest->msg_queue->queue[dest->msg_queue->head], msg, ((Message_t*)msg)->msg_size);
@@ -104,7 +104,7 @@ void* MsgQueueGet(ActiveObject_t* ao)
 {
     void* data;
 
-    while(MsgQueueIsEmpty(ao->msg_queue))
+    while (MsgQueueIsEmpty(ao->msg_queue))
     {
         // block, should not block because MsgQueueGet wshould not be called unless message is in
         // queue

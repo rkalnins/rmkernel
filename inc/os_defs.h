@@ -5,8 +5,8 @@
 #include <stdint.h>
 
 #ifdef OS_TRACE_ENABLED
-#define DEBUG_PRINT_IS_QUEUE    1
-#define DEBUG_PRINT_IS_HANDLE   0
+    #define DEBUG_PRINT_IS_QUEUE  1
+    #define DEBUG_PRINT_IS_HANDLE 0
 #endif
 
 #define OS_BASEPRI 0x3F
@@ -33,21 +33,19 @@
 
 // clang-format on
 
-
 #ifndef UNUSED
-#define UNUSED(X) (void)(X)
+    #define UNUSED(X) (void)(X)
 #endif
 
 //! compile time assertion
-#define STATIC_ASSERT(X)                                                            \
-    do                                                                              \
-    {                                                                               \
-        extern int __attribute__((error("assertion failure: '" #X "' not true")))   \
-        compile_time_check();                                                       \
-        int tmp = ((X) ? 0 : compile_time_check());                                 \
-        UNUSED(tmp);                                                                \
-    } while(false);                                                                 \
-
+#define STATIC_ASSERT(X)                                                                           \
+    do                                                                                             \
+    {                                                                                              \
+        extern int __attribute__((error("assertion failure: '" #X "' not true")))                  \
+        compile_time_check();                                                                      \
+        int tmp = ((X) ? 0 : compile_time_check());                                                \
+        UNUSED(tmp);                                                                               \
+    } while (false);
 
 /**
  * @brief Macro to be called upon entering an ISR
@@ -55,8 +53,8 @@
  * More of a temporary placeholder for future development right now
  *
  */
-#define OS_ISR_ENTER(os) \
-    {                    \
+#define OS_ISR_ENTER(os)                                                                           \
+    {                                                                                              \
     }
 
 /**
@@ -65,15 +63,15 @@
  * Sets PendSV bit if an AO has been queued during ISR handling
  *
  */
-#define OS_ISR_EXIT(os)                                \
-    {                                                  \
-        DISABLE_INTERRUPTS();                          \
-        if(0U != Schedule())                           \
-        {                                              \
-            *((uint32_t*)(0xE000ED04U)) = (1U << 28U); \
-        }                                              \
-        ENABLE_INTERRUPTS();                           \
-        ERRATUM();                                     \
+#define OS_ISR_EXIT(os)                                                                            \
+    {                                                                                              \
+        DISABLE_INTERRUPTS();                                                                      \
+        if (0U != Schedule())                                                                      \
+        {                                                                                          \
+            *((uint32_t*)(0xE000ED04U)) = (1U << 28U);                                             \
+        }                                                                                          \
+        ENABLE_INTERRUPTS();                                                                       \
+        ERRATUM();                                                                                 \
     }
 
 typedef uint8_t OSStatus_t;
@@ -88,9 +86,9 @@ typedef struct OSCallbacksCfg_s OSCallbacksCfg_t;
 typedef struct MessageQueue_s MessageQueue_t;
 
 //! see os_msg.h
-typedef struct MessageGeneric_s MessageGeneric_t;
-typedef struct Message_s Message_t;
-typedef struct DataMessage_s DataMessage_t;
+typedef struct MessageGeneric_s     MessageGeneric_t;
+typedef struct Message_s            Message_t;
+typedef struct DataMessage_s        DataMessage_t;
 typedef struct MemoryBlockMessage_s MemoryBlockMessage_t;
 
 //! see os.h
@@ -104,4 +102,3 @@ typedef struct TimedEventSimple_s TimedEventSimple_t;
  *
  */
 typedef void (*EventHandler_f)(Message_t*);
-
