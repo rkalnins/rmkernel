@@ -1,4 +1,10 @@
-# Realtime Micro Kernel 
+# Realtime Micro Kernel
+
+See the University of Michigan Fall 2021 EECS 373 final project [WarehouseProhect-EECS373/zumo-controller](https://github.com/WarehouseProject-EECS373/zumo-controller) for usage example.
+
+- See `src/os_port_arm_m4.c` for borrowed and slightly modified code from Quantum Leap's QP-nano (GPLv3)
+- `src/app_defs.h` contains message definitions
+- `src/main.c` contains active object declarations
 
 ## Features
 
