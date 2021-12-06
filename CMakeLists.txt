@@ -20,6 +20,7 @@ set(OS_SOURCES
     src/os_mem.c
     src/os_msg.c
     src/os_util.c
+    src/state_machine.c
 )
 
 
@@ -29,6 +30,7 @@ set(OS_HEADERS
    inc/os_mem.h
    inc/os_msg.h
    inc/os_util.h
+   inc/state_machine.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${OS_SOURCES} ${OS_HEADERS})
