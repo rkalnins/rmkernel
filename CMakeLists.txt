@@ -10,6 +10,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 project(rmkernel C ASM)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
+# TODO: this needs to be fixed for porting
 set(CMAKE_C_FLAGS "-mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffunction-sections -fdata-sections -Wall -specs=\"nosys.specs\"")
 
 set(CMAKE_C_FLAGS_RELEASE "-Os")
@@ -33,7 +34,11 @@ set(OS_HEADERS
    inc/state_machine.h
 )
 
-add_library(${PROJECT_NAME} STATIC ${OS_SOURCES} ${OS_HEADERS})
+set(OS_PORT_SOURCE
+    ports/${OS_PORT}/port.c
+)
+
+add_library(${PROJECT_NAME} STATIC ${OS_SOURCES} ${OS_HEADERS} ${OS_PORT_SOURCE})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
