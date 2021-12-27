@@ -1,3 +1,7 @@
+/**
+ * @file os_util.c
+ */
+
 #include "inc/os_util.h"
 
 #include <stdint.h>

@@ -1,4 +1,5 @@
 build/
 debug/
+docs/
 
 .DS_Store

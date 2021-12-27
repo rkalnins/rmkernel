@@ -1,4 +1,8 @@
-#include "state_machine.h"
+/**
+ * @file state_machine.c
+ */
+
+#include "inc/state_machine.h"
 
 extern void StateMachineInit(StateMachine_t* sm, Command_t* start)
 {

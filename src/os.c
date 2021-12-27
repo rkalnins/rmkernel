@@ -1,3 +1,7 @@
+/**
+ * @file os.c
+ */
+
 #include "inc/os.h"
 #include "inc/os_msg.h"
 

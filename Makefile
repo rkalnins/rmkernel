@@ -1,8 +1,8 @@
-all: fullclean clean build format
-.PHONY: fullclean clean build format
+all : fullclean clean build format docs view_docs
+.PHONY: fullclean clean build format docs view_docs
 
 fullclean :
-	rm -rf build/ debug/
+	rm -rf build/
 
 clean :
 	$(MAKE) clean -C build
@@ -12,3 +12,9 @@ build :
 
 format :
 	./tools/format.sh
+
+docs :
+	doxygen
+
+view_docs :
+	open docs/html/index.html

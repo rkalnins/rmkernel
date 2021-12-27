@@ -1,3 +1,7 @@
+/**
+ * @file os_msg.h
+ */
+
 #pragma once
 
 #include "os_defs.h"

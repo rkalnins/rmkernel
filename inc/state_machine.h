@@ -1,3 +1,7 @@
+/**
+ * @file state_machine.h
+ */
+
 #pragma once
 
 #include "os_defs.h"
@@ -49,6 +53,8 @@ extern void StateMachineStart(StateMachine_t* sm, void* instance_data);
  *
  * @param sm State machine instance
  * @param msg Current message
- * @paramm instance_data
+ * @param instance_data
+ *
+ * @return true if command is finished
  */
 extern bool StateMachineStep(StateMachine_t* sm, Message_t* msg, void* instance_data);

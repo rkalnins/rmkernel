@@ -1,3 +1,7 @@
+/**
+ * @file os_defs.h
+ */
+
 #pragma once
 
 #include <stdbool.h>
