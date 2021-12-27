@@ -138,9 +138,79 @@ OSMemoryFreeBlock(key);
 
 ### State Machine Framework
 
-```cpp
-#include "app_definitions.h"
+We create three commands: A, B, and C. A, B, and C are chained together in that order.
+Command A's implementation is expanded. To create nested hierarchies, create `StateMachine_t`
+in the `CommandX_t` struct. Initialize it and then start the state machine the command in the command's `on_Start`
+function. `on_Message` should pass the given message down into the nested state machine (i.e. treat `on_Message`
+like an event handler as seen in `state_controller.c`).
 
+```cpp
+// app_definitions.h
+#define DONE_MSG_ID 0x102
+```
+
+```cpp
+// cmd_a.h
+#include "app_definitions.h"
+#include <state_machine.h>
+
+typedef struct CommandA_s
+{
+    Command_t base;
+    // add state machine instance here to create nested hierarchies
+    // instance data
+} CommandA_t;
+
+extern void CmdAInit(CommandA_t *cmd, /* init data */, Command_t *next);
+
+// instance data here is optional, if anything needs to be passed down to the Command instances
+extern void CmdA_OnStart(CommandA_t *cmd, void *instance_data);
+extern bool CmdA_OnMessage(CommandA_t *cmd, Message_t *msg, void *instance_data);
+extern void CmdA_OnEnd(CommandA_t *cmd, void *instance_data);
+```
+
+```cpp
+// cmd_a.c
+
+#include "cmd_a.h"
+
+extern void CmdA_Init(CommandA_t *cmd, /* init data */, Command_t *next)
+{
+    cmd->base.on_Start = CmdA_OnStart;
+    cmd->base.on_Message = CmdA_OnMessage;
+    cmd->base.on_End = CmdA_OnEnd;
+
+    // waits until OnMessage returns true, COMMAND_ON_END_INSTANT immediately goes to next state
+    // after running OnStart
+    cmd->base.end_behavior = COMMAND_ON_END_WAIT_FOR_END;
+
+    // chain next command to this one, NULL will be end of chain
+    cmd->base.next = next;
+
+    /* set init/instance data */
+}
+
+extern void CmdA_OnStart(CommandA_t *cmd, void *instance_data)
+{
+    // runs when command starts    
+}
+
+extern bool CmdA_OnMessage(CommandA_t *cmd, Message_t *msg, void *instance_data)
+{
+    // return true if done so state machine can advance to next state
+    return DONE_MSG_ID == msg->id;
+}
+
+extern void CmdA_OnEnd(CommandA_t *cmd, void *instance_data)
+{
+    // runs when command is done (after OnMessage returns true)
+}
+
+```
+
+```cpp
+// state_controller.c
+#include "app_definitions.h"
 #include <state_machine.h>
 
 #include "cmd_a.h"
@@ -155,9 +225,9 @@ static CommandC_t cmd_c;
 
 void Init()
 {
-    CmdAInit(&cmd_a, (Command_t*) cmd_b); // b follows a
-    CmdAInit(&cmd_b, (Command_t*) cmd_c); // c follows b
-    CmdAInit(&cmd_c, (Command_t*) NULL); // NULL pointer ends sequence
+    CmdA_Init(&cmd_a, /* init data */, (Command_t*) cmd_b); // b follows a
+    CmdB_Init(&cmd_b, /* init data */, (Command_t*) cmd_c); // c follows b
+    CmdC_Init(&cmd_c, /* init data */, (Command_t*) NULL); // NULL pointer ends sequence
 
     StateMachineInit(&sm, (Command_t*) cmd_a); // starting with cmd_a
     StateMachineStart(&sm, NULL);
