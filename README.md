@@ -8,7 +8,7 @@ In the example project, a bit of a different source structure is used, specifica
 - `src/app_defs.h` contains message definitions
 - `src/main.c` contains active object declarations
 
-Currently, `os_port_arm_m4.c` is `ports/arm-cortex-m4/port.c`.
+Currently, `os_port_arm_m4.c` in the example project is `ports/arm-cortex-m4/port.c` in `rmkernel`.
 
 ## Features
 
