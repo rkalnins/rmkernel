@@ -1,20 +1,19 @@
-all : fullclean clean build format docs view_docs
-.PHONY: fullclean clean build format docs view_docs
+.PHONY: purge clean build format docs view_docs
 
-fullclean :
-	rm -rf build/
-
-clean :
-	$(MAKE) clean -C build
-
-build :
+build:
 	cmake -DOS_PORT=arm-cortex-m4 -DCMAKE_C_COMPILER=/usr/local/bin/arm-none-eabi-gcc -DCMAKE_BUILD_TYPE=Debug -Bbuild && $(MAKE) -C build
 
-format :
+purge:
+	rm -rf build/
+
+clean:
+	$(MAKE) clean -C build
+
+format:
 	./tools/format.sh
 
-docs :
+docs:
 	doxygen
 
-view_docs :
+view_docs:
 	open docs/html/index.html
